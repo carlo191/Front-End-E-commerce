@@ -30,8 +30,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       if (res.ok) {
         const data = await res.json();
-        setMessage(`Login effettuato! Benvenuto ${data.nome}`);
-        onLogin(data); // Passa i dati utente a App
+        const user = data.user; // ✅ Estrai l'oggetto utente corretto
+        setMessage(`Login effettuato! Benvenuto ${user.nome} (${user.ruolo})`);
+        onLogin(user); // ✅ Passa l'utente corretto
       } else {
         const error = await res.json();
         setMessage(`Errore: ${error.message}`);
