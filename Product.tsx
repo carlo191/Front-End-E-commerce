@@ -1,20 +1,34 @@
 import React, { useEffect, useState } from "react";
+
+// Tipo prodotto
 export interface Product {
   id: number;
   nome: string;
   produttore: string;
-  foto: string; // URL o path
+  foto: string;
   prezzo: number;
   descrizione: string;
   categoria: string;
 }
 
-const Products: React.FC = () => {
+// Tipo utente per props
+type User = {
+  id: number;
+  nome: string;
+  ruolo: "admin" | "user";
+  email: string;
+};
+
+// Props: serve il currentUser
+type ProductsProps = {
+  currentUser: User;
+};
+
+const Products: React.FC<ProductsProps> = ({ currentUser }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Stato per il form di aggiunta/modifica prodotto
   const [formData, setFormData] = useState<Product>({
     id: 0,
     nome: "",
@@ -26,7 +40,6 @@ const Products: React.FC = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Carica prodotti da backend
   const fetchProducts = async () => {
     setLoading(true);
     setError("");
@@ -45,7 +58,6 @@ const Products: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Handle form submit (crea o aggiorna)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -79,7 +91,6 @@ const Products: React.FC = () => {
     }
   };
 
-  // Cancella prodotto
   const handleDelete = async (id: number) => {
     if (!window.confirm("Sei sicuro di voler eliminare questo prodotto?"))
       return;
@@ -95,13 +106,11 @@ const Products: React.FC = () => {
     }
   };
 
-  // Carica prodotto nel form per modifica
   const handleEdit = (product: Product) => {
     setFormData(product);
     setIsEditing(true);
   };
 
-  // Cambia valori form
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -123,61 +132,67 @@ const Products: React.FC = () => {
         {products.map((p) => (
           <li key={p.id}>
             <strong>{p.nome}</strong> - {p.produttore} - €{p.prezzo.toFixed(2)}{" "}
-            <button onClick={() => handleEdit(p)}>Modifica</button>
-            <button onClick={() => handleDelete(p.id)}>Elimina</button>
+            {currentUser.ruolo === "admin" && (
+              <>
+                <button onClick={() => handleEdit(p)}>Modifica</button>
+                <button onClick={() => handleDelete(p.id)}>Elimina</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
 
-      <h3>{isEditing ? "Modifica Prodotto" : "Aggiungi Prodotto"}</h3>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nome"
-          value={formData.nome}
-          onChange={handleChange}
-          placeholder="Nome"
-          required
-        />
-        <input
-          name="produttore"
-          value={formData.produttore}
-          onChange={handleChange}
-          placeholder="Produttore"
-          required
-        />
-        <input
-          name="foto"
-          value={formData.foto}
-          onChange={handleChange}
-          placeholder="URL Foto"
-        />
-        <input
-          type="number"
-          name="prezzo"
-          value={formData.prezzo}
-          onChange={handleChange}
-          placeholder="Prezzo"
-          min="0"
-          step="0.01"
-          required
-        />
-        <textarea
-          name="descrizione"
-          value={formData.descrizione}
-          onChange={handleChange}
-          placeholder="Descrizione"
-        />
-        <input
-          name="categoria"
-          value={formData.categoria}
-          onChange={handleChange}
-          placeholder="Categoria"
-        />
-        <button type="submit">
-          {isEditing ? "Salva Modifiche" : "Aggiungi Prodotto"}
-        </button>
-      </form>
+      {currentUser.ruolo === "admin" && (
+        <>
+          <h3>{isEditing ? "Modifica prodotto" : "Aggiungi nuovo prodotto"}</h3>
+          <form onSubmit={handleSubmit}>
+            <input
+              name="nome"
+              value={formData.nome}
+              onChange={handleChange}
+              placeholder="Nome"
+              required
+            />
+            <input
+              name="produttore"
+              value={formData.produttore}
+              onChange={handleChange}
+              placeholder="Produttore"
+              required
+            />
+            <input
+              name="foto"
+              value={formData.foto}
+              onChange={handleChange}
+              placeholder="URL foto"
+              required
+            />
+            <input
+              name="prezzo"
+              type="number"
+              value={formData.prezzo}
+              onChange={handleChange}
+              placeholder="Prezzo"
+              required
+            />
+            <textarea
+              name="descrizione"
+              value={formData.descrizione}
+              onChange={handleChange}
+              placeholder="Descrizione"
+              required
+            />
+            <input
+              name="categoria"
+              value={formData.categoria}
+              onChange={handleChange}
+              placeholder="Categoria"
+              required
+            />
+            <button type="submit">{isEditing ? "Aggiorna" : "Aggiungi"}</button>
+          </form>
+        </>
+      )}
     </div>
   );
 };

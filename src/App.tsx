@@ -67,7 +67,8 @@ function App() {
       )}
       {currentUser && view === "products" && (
         <>
-          <Products />
+          {/* Passa currentUser a Products per gestire permessi */}
+          <Products currentUser={currentUser} />
           {currentUser.ruolo === "admin" && <AddProduct />}
         </>
       )}
