@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 // Tipo utente da esportare per riutilizzo
 export type User = {
   id: number;
@@ -30,16 +31,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       });
 
       if (res.ok) {
-        const data = await res.json(); // supponiamo il server ritorni l’utente registrato
-
-        setMessage(
-          "Registrazione completata con successo! Ora puoi fare il login."
-        );
-
-        // chiama onRegister per aggiornare lo stato utente in App.tsx
+        const data = await res.json();
+        setMessage("✅ Registrazione completata con successo!");
         onRegister(data);
-
-        // pulisci campi se vuoi:
         setNome("");
         setCognome("");
         setDataNascita("");
@@ -47,78 +41,83 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
         setPassword("");
       } else {
         const error = await res.json();
-        setMessage(`Errore: ${error.message}`);
+        setMessage(`❌ Errore: ${error.message}`);
       }
     } catch (error) {
-      setMessage("Errore di connessione al server");
+      setMessage("❌ Errore di connessione al server");
     }
   };
 
   return (
-    <div>
-      <h2>Registrazione</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Nome:
-          <br />
+    <div className="container mt-5">
+      <h2 className="text-center mb-4">Registrazione</h2>
+      <form onSubmit={handleSubmit} className="border p-4 rounded bg-light shadow-sm">
+        <div className="mb-3">
+          <label className="form-label">Nome</label>
           <input
+            type="text"
+            className="form-control"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             required
           />
-        </label>
-        <br />
-        <br />
-        <label>
-          Cognome:
-          <br />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Cognome</label>
           <input
+            type="text"
+            className="form-control"
             value={cognome}
             onChange={(e) => setCognome(e.target.value)}
             required
           />
-        </label>
-        <br />
-        <br />
-        <label>
-          Data di nascita:
-          <br />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Data di nascita</label>
           <input
             type="date"
+            className="form-control"
             value={dataNascita}
             onChange={(e) => setDataNascita(e.target.value)}
             required
           />
-        </label>
-        <br />
-        <br />
-        <label>
-          Email:
-          <br />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Email</label>
           <input
-            type="text"
+            type="email"
+            className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </label>
-        <br />
-        <br />
-        <label>
-          Password:
-          <br />
+        </div>
+        <div className="mb-4">
+          <label className="form-label">Password</label>
           <input
             type="password"
+            className="form-control"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </label>
-        <br />
-        <br />
-        <button type="submit">Registrati</button>
+        </div>
+        <button type="submit" className="btn btn-primary w-100">
+          Registrati
+        </button>
       </form>
-      <div>{message}</div>
+
+      {message && (
+        <div
+          className={`alert mt-4 ${
+            message.startsWith("✅")
+              ? "alert-success"
+              : "alert-danger"
+          }`}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 };

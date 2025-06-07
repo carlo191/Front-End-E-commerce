@@ -33,7 +33,7 @@ const AddProduct: React.FC = () => {
 
       if (!res.ok) throw new Error("Errore durante l'aggiunta del prodotto");
 
-      setMessage("Prodotto aggiunto con successo!");
+      setMessage("✅ Prodotto aggiunto con successo!");
       setFormData({
         nome: "",
         produttore: "",
@@ -43,58 +43,94 @@ const AddProduct: React.FC = () => {
         categoria: "",
       });
     } catch (err: any) {
-      setMessage(err.message);
+      setMessage(`❌ ${err.message}`);
     }
   };
 
   return (
-    <div>
-      <h3>Aggiungi nuovo prodotto (solo admin)</h3>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nome"
-          value={formData.nome}
-          onChange={handleChange}
-          placeholder="Nome"
-          required
-        />
-        <input
-          name="produttore"
-          value={formData.produttore}
-          onChange={handleChange}
-          placeholder="Produttore"
-          required
-        />
-        <input
-          name="foto"
-          value={formData.foto}
-          onChange={handleChange}
-          placeholder="URL foto"
-        />
-        <input
-          name="prezzo"
-          type="text"
-          value={formData.prezzo}
-          onChange={handleChange}
-          placeholder="Prezzo"
-          required
-        />
-        <textarea
-          name="descrizione"
-          value={formData.descrizione}
-          onChange={handleChange}
-          placeholder="Descrizione"
-        />
-        <input
-          name="categoria"
-          value={formData.categoria}
-          onChange={handleChange}
-          placeholder="Categoria"
-          required
-        />
-        <button type="submit">Aggiungi</button>
+    <div className="container mt-5">
+      <h3 className="mb-4 text-center">Aggiungi nuovo prodotto (solo admin)</h3>
+      <form onSubmit={handleSubmit} className="border p-4 rounded shadow-sm bg-light">
+        <div className="mb-3">
+          <label className="form-label">Nome</label>
+          <input
+            name="nome"
+            className="form-control"
+            value={formData.nome}
+            onChange={handleChange}
+            placeholder="Nome"
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Produttore</label>
+          <input
+            name="produttore"
+            className="form-control"
+            value={formData.produttore}
+            onChange={handleChange}
+            placeholder="Produttore"
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">URL Foto</label>
+          <input
+            name="foto"
+            className="form-control"
+            value={formData.foto}
+            onChange={handleChange}
+            placeholder="URL immagine"
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Prezzo (€)</label>
+          <input
+            name="prezzo"
+            type="number"
+            className="form-control"
+            value={formData.prezzo}
+            onChange={handleChange}
+            placeholder="Prezzo"
+            required
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Descrizione</label>
+          <textarea
+            name="descrizione"
+            className="form-control"
+            rows={3}
+            value={formData.descrizione}
+            onChange={handleChange}
+            placeholder="Descrizione"
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Categoria</label>
+          <input
+            name="categoria"
+            className="form-control"
+            value={formData.categoria}
+            onChange={handleChange}
+            placeholder="Categoria"
+            required
+          />
+        </div>
+        <div className="text-center">
+          <button type="submit" className="btn btn-success w-100">
+            Aggiungi
+          </button>
+        </div>
       </form>
-      {message && <p>{message}</p>}
+
+      {message && (
+        <div className={`alert mt-4 ${message.startsWith("✅") ? "alert-success" : "alert-danger"}`}>
+          {message}
+        </div>
+      )}
     </div>
   );
 };

@@ -51,7 +51,8 @@ const Products: React.FC<ProductsProps> = ({ currentUser }) => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo prodotto?")) return;
+    if (!window.confirm("Sei sicuro di voler eliminare questo prodotto?"))
+      return;
 
     try {
       const res = await fetch(`http://localhost:3000/api/products/${id}`, {
@@ -69,28 +70,52 @@ const Products: React.FC<ProductsProps> = ({ currentUser }) => {
   };
 
   return (
-    <div>
-      <h2>Catalogo Prodotti</h2>
+    <div className="container my-4">
+      <h2 className="mb-4 text-center">Catalogo Prodotti</h2>
 
-      {loading && <p>Caricamento...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <div className="alert alert-info">Caricamento...</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      <ul>
+      <div className="row">
         {products.map((p) => (
-          <li key={p.id}>
-            <strong>{p.nome}</strong> - {p.produttore} - €{p.prezzo.toFixed(2)}{" "}
-            <button onClick={() => handleDetail(p.id)}>Vedi dettagli</button>
-            {currentUser.ruolo === "admin" && (
-              <>
-                <button onClick={() => handleDelete(p.id)}>Elimina</button>
-                <button onClick={() => navigate(`/products/edit/${p.id}`)}>
-                  Modifica
+          <div className="col-md-4 mb-4" key={p.id}>
+            <div className="card h-100">
+              <div className="card-body">
+                <h5 className="card-title">{p.nome}</h5>
+                <p className="card-text">
+                  <strong>Produttore:</strong> {p.produttore}
+                  <br />
+                  <strong>Prezzo:</strong> €{p.prezzo.toFixed(2)}
+                </p>
+              </div>
+              <div className="card-footer d-flex justify-content-between">
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleDetail(p.id)}
+                >
+                  Dettagli
                 </button>
-              </>
-            )}
-          </li>
+                {currentUser.ruolo === "admin" && (
+                  <div>
+                    <button
+                      className="btn btn-warning btn-sm me-2"
+                      onClick={() => navigate(`/products/edit/${p.id}`)}
+                    >
+                      Modifica
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(p.id)}
+                    >
+                      Elimina
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
