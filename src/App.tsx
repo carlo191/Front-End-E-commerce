@@ -1,8 +1,19 @@
 import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+} from "react-router-dom";
+
 import Login from "./Login";
 import Register from "./Register";
 import Products from "../Product";
 import AddProduct from "./AddProduct";
+
+import ProductDetail from "../ProductDetail";
+import EditProduct from "../EditProduct"; // Import componente edit
 
 type User = {
   id: number;
@@ -12,67 +23,74 @@ type User = {
 };
 
 function App() {
-  // Stato per gestire cosa mostrare
-  const [view, setView] = useState<"login" | "register" | "products">("login");
-
-  // Stato per utente loggato (null se nessuno)
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // Funzione per simulare login (verrà chiamata da <Login />)
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    setView("products"); // dopo login vai al catalogo prodotti
   };
 
-  // Funzione per logout
   const handleLogout = () => {
     setCurrentUser(null);
-    setView("login");
   };
 
   return (
-    <div className="App">
-      <div style={{ marginBottom: 20 }}>
-        {!currentUser ? (
-          <>
-            <button onClick={() => setView("login")}>Vai a Login</button>
-            <button
-              onClick={() => setView("register")}
-              style={{ marginLeft: 10 }}
-            >
-              Vai a Registrazione
-            </button>
-          </>
-        ) : (
-          <>
-            <span>
-              Benvenuto, {currentUser.nome} ({currentUser.ruolo})
-            </span>
-            <button onClick={handleLogout} style={{ marginLeft: 10 }}>
-              Logout
-            </button>
-            <button
-              onClick={() => setView("products")}
-              style={{ marginLeft: 10 }}
-            >
-              Vai a Catalogo Prodotti
-            </button>
-          </>
-        )}
-      </div>
+    <Router>
+      <div className="App">
+        <nav style={{ marginBottom: 20 }}>
+          {!currentUser ? (
+            <>
+              <Link to="/login">Login</Link>
+              <Link to="/register" style={{ marginLeft: 10 }}>
+                Registrazione
+              </Link>
+            </>
+          ) : (
+            <>
+              <span>
+                Benvenuto, {currentUser.nome} ({currentUser.ruolo})
+              </span>
+              <button onClick={handleLogout} style={{ marginLeft: 10 }}>
+                Logout
+              </button>
+              <Link to="/products" style={{ marginLeft: 10 }}>
+                Catalogo Prodotti
+              </Link>
+            </>
+          )}
+        </nav>
 
-      {!currentUser && view === "login" && <Login onLogin={handleLogin} />}
-      {!currentUser && view === "register" && (
-        <Register onRegister={handleLogin} />
-      )}
-      {currentUser && view === "products" && (
-        <>
-          {/* Passa currentUser a Products per gestire permessi */}
-          <Products currentUser={currentUser} />
-          {currentUser.ruolo === "admin" && <AddProduct />}
-        </>
-      )}
-    </div>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route
+            path="/register"
+            element={<Register onRegister={handleLogin} />}
+          />
+          <Route
+            path="/products"
+            element={
+              currentUser ? (
+                <>
+                  <Products currentUser={currentUser} />
+                  {currentUser.ruolo === "admin" && <AddProduct />}
+                </>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/products/:id"
+            element={currentUser ? <ProductDetail /> : <Navigate to="/login" />}
+          />
+          {/* Route per edit prodotto */}
+          <Route
+            path="/products/edit/:id"
+            element={currentUser ? <EditProduct /> : <Navigate to="/login" />}
+          />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
