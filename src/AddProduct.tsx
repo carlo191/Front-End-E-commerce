@@ -5,7 +5,7 @@ const AddProduct: React.FC = () => {
     nome: "",
     produttore: "",
     foto: "",
-    prezzo: "", // ora stringa!
+    prezzo: "", // stringa per gestione input testuale
     descrizione: "",
     categoria: "",
   });
@@ -19,11 +19,18 @@ const AddProduct: React.FC = () => {
 
     if (name === "prezzo") {
       // Rimuove tutte le lettere (a-zA-Z)
-      const pulito = value.replace(/[a-zA-Z]/g, "");
-      setFormData((prev) => ({
-        ...prev,
-        [name]: pulito,
-      }));
+      let pulito = value.replace(/[a-zA-Z]/g, "");
+
+      // Regex che permette solo numeri, un punto o una virgola e massimo 2 cifre decimali
+      const regex = /^(\d+)?([.,]{1}(\d{0,2})?)?$/;
+
+      if (pulito === "" || regex.test(pulito)) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: pulito,
+        }));
+      }
+      // altrimenti ignora il cambiamento (non aggiorna lo stato)
     } else {
       setFormData((prev) => ({
         ...prev,
