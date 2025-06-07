@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-
-// Tipo utente da esportare per riutilizzo
+import { useNavigate } from "react-router-dom";
 export type User = {
   id: number;
   nome: string;
@@ -8,15 +7,15 @@ export type User = {
   email: string;
 };
 
-// Tipo per le props che il componente riceve
 type LoginProps = {
   onLogin: (user: User) => void;
 };
-
+import "bootstrap/dist/css/bootstrap.min.css";
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +29,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       if (res.ok) {
         const data = await res.json();
-        const user = data.user; // ✅ Estrai l'oggetto utente corretto
+        const user = data.user;
         setMessage(`Login effettuato! Benvenuto ${user.nome} (${user.ruolo})`);
-        onLogin(user); // ✅ Passa l'utente corretto
+        onLogin(user);
+        navigate("/products");
       } else {
         const error = await res.json();
         setMessage(`Errore: ${error.message}`);
@@ -43,36 +43,46 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container mt-5" style={{ maxWidth: 400 }}>
+      <h2 className="mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
-        <label>
-          Email:
-          <br />
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label">
+            Email:
+          </label>
           <input
+            id="email"
             type="text"
+            className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            placeholder="Inserisci email"
           />
-        </label>
-        <br />
-        <br />
-        <label>
-          Password:
-          <br />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="password" className="form-label">
+            Password:
+          </label>
           <input
+            id="password"
             type="password"
+            className="form-control"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            placeholder="Inserisci password"
           />
-        </label>
-        <br />
-        <br />
-        <button type="submit">Accedi</button>
+        </div>
+        <button type="submit" className="btn btn-primary w-100">
+          Accedi
+        </button>
       </form>
-      <div>{message}</div>
+      {message && (
+        <div className="alert alert-info mt-3" role="alert">
+          {message}
+        </div>
+      )}
     </div>
   );
 };
