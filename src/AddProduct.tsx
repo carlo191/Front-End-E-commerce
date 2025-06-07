@@ -5,7 +5,7 @@ const AddProduct: React.FC = () => {
     nome: "",
     produttore: "",
     foto: "",
-    prezzo: 0,
+    prezzo: "", // ora stringa!
     descrizione: "",
     categoria: "",
   });
@@ -16,19 +16,44 @@ const AddProduct: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "prezzo" ? Number(value) : value,
-    }));
+
+    if (name === "prezzo") {
+      // Rimuove tutte le lettere (a-zA-Z)
+      const pulito = value.replace(/[a-zA-Z]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: pulito,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // converto prezzo: virgola -> punto, tolgo spazi, parseFloat
+    const prezzoPulito = formData.prezzo.replace(/\s/g, "").replace(",", ".");
+    const prezzoNumero = parseFloat(prezzoPulito);
+
+    if (isNaN(prezzoNumero) || prezzoNumero < 0) {
+      setMessage("❌ Prezzo non valido");
+      return;
+    }
+
+    const datiDaInviare = {
+      ...formData,
+      prezzo: prezzoNumero,
+    };
+
     try {
       const res = await fetch("http://localhost:3000/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(datiDaInviare),
       });
 
       if (!res.ok) throw new Error("Errore durante l'aggiunta del prodotto");
@@ -38,7 +63,7 @@ const AddProduct: React.FC = () => {
         nome: "",
         produttore: "",
         foto: "",
-        prezzo: 0,
+        prezzo: "",
         descrizione: "",
         categoria: "",
       });
@@ -50,7 +75,10 @@ const AddProduct: React.FC = () => {
   return (
     <div className="container mt-5">
       <h3 className="mb-4 text-center">Aggiungi nuovo prodotto (solo admin)</h3>
-      <form onSubmit={handleSubmit} className="border p-4 rounded shadow-sm bg-light">
+      <form
+        onSubmit={handleSubmit}
+        className="border p-4 rounded shadow-sm bg-light"
+      >
         <div className="mb-3">
           <label className="form-label">Nome</label>
           <input
@@ -87,14 +115,12 @@ const AddProduct: React.FC = () => {
           <label className="form-label">Prezzo (€)</label>
           <input
             name="prezzo"
-            type="number"
+            type="text"
             className="form-control"
             value={formData.prezzo}
             onChange={handleChange}
             placeholder="Prezzo"
             required
-            min="0"
-            step="0.01"
           />
         </div>
         <div className="mb-3">
@@ -127,7 +153,11 @@ const AddProduct: React.FC = () => {
       </form>
 
       {message && (
-        <div className={`alert mt-4 ${message.startsWith("✅") ? "alert-success" : "alert-danger"}`}>
+        <div
+          className={`alert mt-4 ${
+            message.startsWith("✅") ? "alert-success" : "alert-danger"
+          }`}
+        >
           {message}
         </div>
       )}
