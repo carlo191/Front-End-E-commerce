@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-// Tipo prodotto
 interface Product {
   id: number;
   nome: string;
@@ -13,7 +12,7 @@ interface Product {
 }
 
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>(); // id è stringa dai parametri url
+  const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -27,16 +26,40 @@ const ProductDetail = () => {
       .catch(() => setProduct(null));
   }, [id]);
 
-  if (!product) return <p>Prodotto non trovato.</p>;
+  if (!product)
+    return <p className="text-center mt-4">Prodotto non trovato.</p>;
 
   return (
-    <div>
-      <h2>{product.nome}</h2>
-      <img src={product.foto} alt={product.nome} width={200} />
-      <p>Produttore: {product.produttore}</p>
-      <p>Prezzo: €{product.prezzo.toFixed(2)}</p>
-      <p>Descrizione: {product.descrizione}</p>
-      <p>Categoria: {product.categoria}</p>
+    <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card" style={{ maxWidth: 600, width: "100%" }}>
+        <img
+          src={
+            product.foto ||
+            "https://dummyimage.com/600x400/cccccc/000000&text=No+Image"
+          }
+          alt={product.nome}
+          className="card-img-top"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src =
+              "https://via.placeholder.com/600x400?text=No+Image";
+          }}
+        />
+        <div className="card-body">
+          <h3 className="card-title">{product.nome}</h3>
+          <p className="card-text">
+            <strong>Produttore:</strong> {product.produttore}
+          </p>
+          <p className="card-text">
+            <strong>Prezzo:</strong> €{product.prezzo.toFixed(2)}
+          </p>
+          <p className="card-text">
+            <strong>Descrizione:</strong> {product.descrizione}
+          </p>
+          <p className="card-text">
+            <strong>Categoria:</strong> {product.categoria}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
