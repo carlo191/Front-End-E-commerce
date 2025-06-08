@@ -6,7 +6,7 @@ interface Product {
   nome: string;
   produttore: string;
   foto: string;
-  prezzo: number | string; // ora può essere anche stringa per input "libero"
+  prezzo: number | string; 
   descrizione: string;
   categoria: string;
 }
@@ -46,7 +46,7 @@ const EditProduct: React.FC = () => {
       let pulito = value.replace(/[a-zA-Z]/g, "");
 
       // Permetti solo numeri, punto e virgola e al massimo due cifre decimali
-      // Questa regex cattura la parte intera e quella decimale fino a 2 cifre
+    
       const regex = /^(\d+)?([.,]{1}(\d{0,2})?)?$/;
 
       if (pulito === "" || regex.test(pulito)) {
@@ -55,7 +55,7 @@ const EditProduct: React.FC = () => {
           [name]: pulito,
         });
       }
-      // se non matcha la regex, non aggiorna l'input (ignora il cambiamento)
+      
     } else {
       setProduct({
         ...product,

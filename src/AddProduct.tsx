@@ -5,7 +5,7 @@ const AddProduct: React.FC = () => {
     nome: "",
     produttore: "",
     foto: "",
-    prezzo: "", // stringa per gestione input testuale
+    prezzo: "", 
     descrizione: "",
     categoria: "",
   });
